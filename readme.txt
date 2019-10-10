@@ -36,5 +36,5 @@ Follow the guide at(https://developer.vivawallet.com) to create a demo or live a
 = How =
 Follow the guide at(https://developer.vivawallet.com) to create a demo or live account in Viva dashboard and then use the necessary credentials in the Woocommerce payment gateway options.
 
-= 1.0.0 =
+= 1.4.1 =
 Initial Release
