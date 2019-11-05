@@ -27,8 +27,7 @@ function FCM_VivaPayments_NativeCheckout_2_Gateway_init()
     class FCM_VivaPayments_NativeCheckout_2_Gateway extends WC_Payment_Gateway
     {
 
-        public function __construct()
-        {
+        public function __construct() {
             global $woocommerce;
 
             $this->id = 'FCM_VivaPayments_NativeCheckout_2_Gateway';
@@ -73,8 +72,7 @@ function FCM_VivaPayments_NativeCheckout_2_Gateway_init()
         /**
          * Admin Panel Options
          * */
-        public function admin_options()
-        {
+        public function admin_options() {
             echo '<h3>' . __('Viva Payments | Native Checkout v2.0 (Unofficial) by FCM', 'viva-woocommerce-payment-gateway') . '</h3>';
             echo '<p>' . __('<br>This plugin is in BETA. There will be many updates and bugs so please be patient. I suggest you enable autoupdate.</b><br>Your Merchant ID and API Key, can be found in your Viva Wallet Dashboard, under Settings > API Access. Make sure to enable "Enable Native/Pay with Viva Wallet checkout". <br>Client_ID and Client_Secret are part of the new API v.2.0. To find yours, head to the <a href="https://developer.vivawallet.com/authentication-methods/#oauth-2-token-generation" target="_blank">appropriate section in the documentation</a>.', 'viva-woocommerce-payment-gateway') . '</p><br>';
 			echo '<table class="form-table">';
@@ -86,8 +84,7 @@ function FCM_VivaPayments_NativeCheckout_2_Gateway_init()
         /**
          * Initialise Gateway Settings Form Fields
          * */
-        function init_form_fields()
-        {
+        function init_form_fields() {
             $this->form_fields = array(
                 'title' => array(
                     'title' => __('Title', 'viva-woocommerce-payment-gateway'),
@@ -161,8 +158,7 @@ function FCM_VivaPayments_NativeCheckout_2_Gateway_init()
         }
 
         //Generate the payment form, load javascripts and css files
-        function Initialize_Payment_Form()
-        {
+        function Initialize_Payment_Form() {
                 $TEXTS = $this->VivaPaymentsTextsObj;
 
                 wp_enqueue_style('form',plugin_dir_url( __FILE__ ) . 'assets/css/form.css');
@@ -180,7 +176,7 @@ function FCM_VivaPayments_NativeCheckout_2_Gateway_init()
                                 <input class="expiry expiry-month viva-input" type="number" maxlength="2" name="expiry-month" placeholder="'.esc_attr($TEXTS->month).'" data-vp="month" >
                                 &#x2f;
                                 <input class="expiry expiry-year viva-input" type="number" maxlength="2" name="expiry-year" placeholder="'.esc_attr($TEXTS->year).'" data-vp="year">
-                                <input class="cvv viva-input" maxlength="4" type="number"name="cvv" placeholder="'.esc_attr($TEXTS->cvv).'" data-vp="cvv">
+                                <input class="cvv viva-input" maxlength="4" type="text" name="cvv" placeholder="'.esc_attr($TEXTS->cvv).'" data-vp="cvv">
                                 </div>
                             </form>
 
@@ -207,8 +203,7 @@ function FCM_VivaPayments_NativeCheckout_2_Gateway_init()
 
         //WooCommerce API: process_payment runs everytime the "Place Order" button is pressed.
 
-        function process_payment($order_id)
-        {
+        function process_payment($order_id) {
             global $woocommerce;
 
             $order = new WC_Order($order_id);
@@ -236,8 +231,7 @@ function FCM_VivaPayments_NativeCheckout_2_Gateway_init()
                     'ORDER_CODE' => $ORDER_CODE
                 ));
 
-                if($TRANSACTION['WAS_SUCCESSFUL'])
-                {
+                if($TRANSACTION['WAS_SUCCESSFUL']){
                     FCM_NativeCheckout2::Complete_Woo_Order(array(
                         'ORDER_ID' => $order_id,
                         'TRANSACTION_ID' => $TRANSACTION['TRANSACTION_ID']
@@ -249,9 +243,18 @@ function FCM_VivaPayments_NativeCheckout_2_Gateway_init()
                     )));
 
                     exit;
-                }
-                else
-                {
+                } else {
+
+                    // 05112019 - Adding failed order to order table
+
+                    FCM_NativeCheckout2::Fail_Woo_Order(array(
+                        'ORDER_ID' => $order_id,
+                        'ERROR_CODE' => $TRANSACTION['ERROR_CODE'],
+                        'ERROR_TEXT' => $TRANSACTION['ERROR_TEXT'],
+                        'STATUS_ID' => $TRANSACTION['STATUS_ID'],
+                        'EVENT_ID' => $TRANSACTION['EVENT_ID']
+                    ));
+
                     echo(json_encode(array(
                             'result' => 'failure',
                             'refresh' => 'false',
@@ -261,9 +264,7 @@ function FCM_VivaPayments_NativeCheckout_2_Gateway_init()
 
                         exit;
                 }
-            }else
-                {
-
+            } else {
                     echo(json_encode(array(
                         'result' => 'failure',
                         'refresh' => 'false',

@@ -1,3 +1,10 @@
-This repository contains an updated version of the Viva Payments Native Checkout v.2.0 (Unofficial) by Donfn [https://wordpress.org/plugins/donfn-viva-payments-native-checkout/].
+This repository contains an updated version of the Viva Payments Native Checkout v.2.0 (Unofficial) by Donfn.
 
- Native Checkout v2.0 from Viva Payments, allows merchants to accept payments natively on their ecommerce store. The card details are harvested natively on your site and are send to Viva Payments directly - without touching your server! SCA, PSD2 and 3D-Secure compatible.
+Updates include passing order details to Viva Wallet.
+
+== 1.4.2 ==
+
+Updates:
+
+- Failed orders now push to woo commerce orders table
+- Added error codes as admin note on failed orders
