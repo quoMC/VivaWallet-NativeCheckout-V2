@@ -3,7 +3,7 @@
 /*
 Plugin Name: Viva Payments' Native Checkout v.2.0 (Unofficial - FCM)
 Description: Native Checkout v2.0 from Viva Payments, allows merchants to accept payments natively on their ecommerce store. The card details are harvested natively on your site and are send to Viva Payments directly - without touching your server! SCA, PSD2 and 3D-Secure compatible.
-Version: 1.4.1
+Version: 1.4.3
 Author: FCM
 Author URI: https://www.full-circle-marketing.co.uk
 License: GPL-3.0+
@@ -113,7 +113,6 @@ function FCM_VivaPayments_NativeCheckout_2_Gateway_init()
                     'description' => __('Enter your Client ID (API v2.0 Credentials). ', 'viva-woocommerce-payment-gateway'),
                     'default' => '',
                     'desc_tip' => false,
-
                 ),
                 'VivaPaymentsClientSecret' => array(
                     'title' => __('Client Secret', 'viva-woocommerce-payment-gateway'),
@@ -121,7 +120,6 @@ function FCM_VivaPayments_NativeCheckout_2_Gateway_init()
                     'description' => __('Enter your Client Secret (API v2.0 Credentials). ', 'viva-woocommerce-payment-gateway'),
                     'default' => '',
                     'desc_tip' => false,
-
                 ),
                 'VivaPaymentsPaymentSource' => array(
                     'title' => __('Payment Source Code', 'viva-woocommerce-payment-gateway'),
@@ -129,7 +127,6 @@ function FCM_VivaPayments_NativeCheckout_2_Gateway_init()
                     'description' => __('You can create a new payment source, under Sales > Online Payments > Websites / Apps.<br> Keep in mind that your website will need to pass validation from Viva Payments. ', 'viva-woocommerce-payment-gateway'),
                     'default' => 'Default',
                     'desc_tip' => false,
-
                 ),
                     'VivaPaymentsCustomCSS' => array(
                         'title' => __('Custom CSS', 'viva-woocommerce-payment-gateway'),
@@ -234,7 +231,11 @@ function FCM_VivaPayments_NativeCheckout_2_Gateway_init()
                 if($TRANSACTION['WAS_SUCCESSFUL']){
                     FCM_NativeCheckout2::Complete_Woo_Order(array(
                         'ORDER_ID' => $order_id,
-                        'TRANSACTION_ID' => $TRANSACTION['TRANSACTION_ID']
+                        'TRANSACTION_ID' => $TRANSACTION['TRANSACTION_ID'],
+                        'ERROR_CODE' => $TRANSACTION['ERROR_CODE'],
+                        'ERROR_TEXT' => $TRANSACTION['ERROR_TEXT'],
+                        'STATUS_ID' => $TRANSACTION['STATUS_ID'],
+                        'EVENT_ID' => $TRANSACTION['EVENT_ID']
                     ));
 
                     echo(json_encode(array(
@@ -243,6 +244,7 @@ function FCM_VivaPayments_NativeCheckout_2_Gateway_init()
                     )));
 
                     exit;
+
                 } else {
 
                     // 05112019 - Adding failed order to order table

@@ -1,6 +1,11 @@
 This repository contains an updated version of the Viva Payments Native Checkout v.2.0 (Unofficial) by Donfn.
-
 Updates include passing order details to Viva Wallet.
+
+== 1.4.3 ==
+
+Updates:
+
+- Added error codes as admin note on successful orders
 
 == 1.4.2 ==
 

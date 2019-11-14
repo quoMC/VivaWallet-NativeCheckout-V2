@@ -128,7 +128,9 @@ class FCM_NativeCheckout2{
                     'WAS_SUCCESSFUL' => TRUE,
                     'TRANSACTION_ID' => $resultObj->TransactionId,
                     'ERROR_CODE' => $resultObj->ErrorCode,
-                    'ERROR_TEXT' => $resultObj->ErrorText
+                    'ERROR_TEXT' => $resultObj->ErrorText,
+                    'STATUS_ID' => $resultObj->StatusId,
+                    'EVENT_ID' => $resultObj->EventId
                 );
             } else {
                 return array(
@@ -155,11 +157,16 @@ class FCM_NativeCheckout2{
 
         $ORDER_ID = $data['ORDER_ID'];
         $TRANSACTION_ID = $data['TRANSACTION_ID'];
+        $STATUS_ID = $data['STATUS_ID'];
+        $ERROR_CODE = $data['ERROR_CODE'];
+        $ERROR_TEXT = $data['ERROR_TEXT'];
+        $EVENT_ID = $data['EVENT_ID'];
 
         global $woocommerce;
         $order = new WC_Order($ORDER_ID);
         $order->payment_complete();
         $order->add_order_note(__('Transaction ID: ', 'FCM_VivaPayments_NativeCheckout_2_Gateway') . $TRANSACTION_ID, 1);
+        $order->add_order_note("Event: " . $EVENT_ID . ", Status Id: " . $STATUS_ID . ", Code: " . $ERROR_CODE . ", Message: " . $ERROR_TEXT);
 
     }
 

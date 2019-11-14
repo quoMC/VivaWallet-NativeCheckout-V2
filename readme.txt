@@ -1,14 +1,12 @@
 === Viva Payments' Native Checkout v.2.0 (Unofficial - FCM) ===
 Tags: woocommerce, payment gateway, payment gateways,viva,wallet,payments,ecommerce,gateway
-Stable tag: 1.4.2
+Stable tag: 1.4.3
 Contributors: FCM
 Author URI: https://www.full-circle-marketing.co.uk
 Requires at least: 4.0
 Tested up to: 5.2.3
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
-
-
 
 == Description ==
 
@@ -26,12 +24,9 @@ License URI: http://www.gnu.org/licenses/gpl-3.0.html
 › This project is maintained by an independent developer, not Viva Payments. It is based on their API documentation on Github [https://github.com/VivaPayments/API].
 › The software is provided 'as is' and the developer assumes no responsibility for any malfunction or error.
 
-
 == Installation ==
 
 Follow the guide at(https://developer.vivawallet.com) to create a demo or live account in Viva dashboard and then use the necessary credentials in the Woocommerce payment gateway options.
-
-
 
 = How =
 Follow the guide at(https://developer.vivawallet.com) to create a demo or live account in Viva dashboard and then use the necessary credentials in the Woocommerce payment gateway options.
