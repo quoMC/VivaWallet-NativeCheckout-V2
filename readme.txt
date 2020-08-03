@@ -1,6 +1,6 @@
 === Viva Payments' Native Checkout v.2.0 (Unofficial - FCM) ===
 Tags: woocommerce, payment gateway, payment gateways,viva,wallet,payments,ecommerce,gateway
-Stable tag: 1.4.3
+Stable tag: 1.4.5
 Contributors: FCM
 Author URI: https://www.full-circle-marketing.co.uk
 Requires at least: 4.0
