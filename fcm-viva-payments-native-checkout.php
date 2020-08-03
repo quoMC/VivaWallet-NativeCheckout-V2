@@ -3,7 +3,7 @@
 /*
 Plugin Name: Viva Payments' Native Checkout v.2.0 (Unofficial - FCM)
 Description: Native Checkout v2.0 from Viva Payments, allows merchants to accept payments natively on their ecommerce store. The card details are harvested natively on your site and are send to Viva Payments directly - without touching your server! SCA, PSD2 and 3D-Secure compatible.
-Version: 1.4.3
+Version: 1.4.5
 Author: FCM
 Author URI: https://www.full-circle-marketing.co.uk
 License: GPL-3.0+
@@ -166,7 +166,7 @@ function FCM_VivaPayments_NativeCheckout_2_Gateway_init()
             wp_enqueue_script('FCM',plugin_dir_url( __FILE__ ) . 'assets/js/fcm.js');
 
                 $result = '
-                            <form class="viva-credit-card-form" id="viva-credit-card-form">
+                            <form class="viva-credit-card-form" id="viva-credit-card-form" autocomplete="off">
                                 <div class="card-js " data-capture-name="true">
                                 <input type="text" data-vp="cardholder" size="20" name="cardholder" class="viva-input cardholder" placeholder="'.esc_attr($TEXTS->card_holder).'">
                                 <input class="cardnumber viva-input" name="cardnumber" onchange="Validate_Card_Form()" maxlength="19" placeholder="'.esc_attr($TEXTS->card_number).'" data-vp="cardnumber" style="background: url('.plugin_dir_url( __FILE__ ).'/assets/img/credit-card.svg) no-repeat 95% center">
@@ -257,11 +257,68 @@ function FCM_VivaPayments_NativeCheckout_2_Gateway_init()
                         'EVENT_ID' => $TRANSACTION['EVENT_ID']
                     ));
 
+                    /* switch ($TRANSACTION['STATUS_ID']) {
+                        case "E" :
+                            $sSTATUS_ID = "The transaction was not completed because of an error";
+                            break;
+                    } */
+
+                    switch ($TRANSACTION['EVENT_ID']) {
+                        case "2061" :
+                            $sEVENT_ID = "Browser closed before authentication finished.";
+                        break;
+                        case "2062" :
+                            $sEVENT_ID = "3DS validation failed - Wrong password or two-factor auth code entered.";
+                        break;
+                        case "10001" :
+                            $sEVENT_ID = "Refer to card issuer - The issuing bank prevented the transaction.";
+                        break;
+                        case "10004" :
+                            $sEVENT_ID = "Pick up card - The card has been designated as lost or stolen.";
+                        break;
+                        case "10005" :
+                            $sEVENT_ID = "Do not honor - The issuing bank declined the transaction without an explanation.";
+                        break;
+                        case "10006" :
+                            $sEVENT_ID = "General error - The card issuer has declined the transaction as there is a problem with the card number.";
+                        break;
+                        case "10014" :
+                            $sEVENT_ID = "Invalid card number - The card issuer has declined the transaction as the credit card number is incorrectly entered or does not exist.";
+                        break;
+                        case "10200" :
+                            $sEVENT_ID = "Your transaction was declined - incorrect card details and/or no available balance";
+                        break;
+                        case "10041" :
+                            $sEVENT_ID = "Lost card - The card issuer has declined the transaction as the card has been reported lost.";
+                        break;
+                        case "10043" :
+                            $sEVENT_ID = "Stolen card - The card has been designated as lost or stolen.";
+                        break;
+                        case "10051" :
+                            $sEVENT_ID = "Insufficient funds - The card has insufficient funds to cover the cost of the transaction.";
+                        break;
+                        case "10054" :
+                            $sEVENT_ID = "Expired card - The payment gateway declined the transaction because the expiration date is expired or does not match.";
+                        break;
+                        default:
+                            $sEVENT_ID = "Your transaction was declined - incorrect card details and/or no available balance";
+                    }
+
                     echo(json_encode(array(
                             'result' => 'failure',
                             'refresh' => 'false',
-                            'messages' => "<div><script type=\"text/javascript\">"
-                            . "$('#charge_token').val(''); alert('".htmlspecialchars($this->VivaPaymentsTextsObj->payment_failed)."');</script></div>"
+                            'messages' => "
+
+                                <div style=\"margin:5px 0;padding:10px;background-color:red;color:white;\">[Error : " . $TRANSACTION['EVENT_ID'] . "] " . $sEVENT_ID. "</div>
+
+                                <script type=\"text/javascript\">
+                                    $('#charge_token').val('');
+                                    $('.viva-credit-card-form').css({
+                                        'border': '1px solid #ff0022'
+                                    });
+                                </script>
+                            "
+
                         )));
 
                         exit;
@@ -275,7 +332,7 @@ function FCM_VivaPayments_NativeCheckout_2_Gateway_init()
 
                             //Open the 3DS container with the loading circle.
                             $('.three-ds-container').show();
-                            var Timeout = setTimeout(function(){ $('.three-ds-container').hide() },30000);
+                            var Timeout = setTimeout(function(){ $('.three-ds-container').hide() },3000);
 
                             //Pass-down the access token and declare the 3DS container
 
@@ -296,15 +353,26 @@ function FCM_VivaPayments_NativeCheckout_2_Gateway_init()
 
                             //Request a charge token from Viva Payments.
                             VivaPayments.cards.requestToken({
+
                                 amount: " . $order->get_total()*100 . ",
                                 authenticateCardholder: true
-                            }).done((responseData) => {
 
-                                $('.three-ds-container').hide(); //Hides the 3DS container
+                            }).then(function(responseData) {
+
+                                $('.three-ds-container').hide();
                                 $('#charge_token').val(responseData.chargeToken);
-                                $('.woocommerce-checkout').submit(); //Re-submit the order, this time with the charge token
-                            })
+                                $('.woocommerce-checkout').submit();
+
+                            }, function(error) {
+
+                                $('.three-ds-container').hide();
+                                $('.woocommerce-NoticeGroup').prepend('<div style=\"margin:5px 0;padding:10px;background-color:red;color:white;\">[Error : 10200] Your transaction was declined - incorrect card details and/or no available balance</div>');
+                                $('.viva-credit-card-form').css({'border': '1px solid #ff0022'});
+
+                            });
+
                         } else {
+
                             $('.viva-credit-card-form').css({
                                 'border': '1px solid #ff0022'
                             });

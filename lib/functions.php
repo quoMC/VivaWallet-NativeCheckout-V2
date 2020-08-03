@@ -166,7 +166,6 @@ class FCM_NativeCheckout2{
         $order = new WC_Order($ORDER_ID);
         $order->payment_complete();
         $order->add_order_note(__('Transaction ID: ', 'FCM_VivaPayments_NativeCheckout_2_Gateway') . $TRANSACTION_ID, 1);
-        $order->add_order_note("Event: " . $EVENT_ID . ", Status Id: " . $STATUS_ID . ", Code: " . $ERROR_CODE . ", Message: " . $ERROR_TEXT);
 
     }
 
@@ -178,10 +177,57 @@ class FCM_NativeCheckout2{
         $ERROR_TEXT = $data['ERROR_TEXT'];
         $EVENT_ID = $data['EVENT_ID'];
 
+        switch ($STATUS_ID) {
+            case "E" :
+                $sSTATUS_ID = "The transaction was not completed because of an error";
+            break;
+        }
+
+        switch ($EVENT_ID) {
+            case "2061" :
+                $sEVENT_ID = "Browser closed before authentication finished.";
+            break;
+            case "2062" :
+                $sEVENT_ID = "3DS validation failed - Wrong password or two-factor auth code entered.";
+            break;
+            case "10001" :
+                $sEVENT_ID = "Refer to card issuer - The issuing bank prevented the transaction.";
+            break;
+            case "10004" :
+                $sEVENT_ID = "Pick up card - The card has been designated as lost or stolen.";
+            break;
+            case "10005" :
+                $sEVENT_ID = "Do not honor - The issuing bank declined the transaction without an explanation.";
+            break;
+            case "10006" :
+                $sEVENT_ID = "General error - The card issuer has declined the transaction as there is a problem with the card number.";
+            break;
+            case "10014" :
+                $sEVENT_ID = "Invalid card number - The card issuer has declined the transaction as the credit card number is incorrectly entered or does not exist.";
+            break;
+            case "10200" :
+                $sEVENT_ID = "The transaction was declined - incorrect card details and/or no available balance";
+            break;
+            case "10041" :
+                $sEVENT_ID = "Lost card - The card issuer has declined the transaction as the card has been reported lost.";
+            break;
+            case "10043" :
+                $sEVENT_ID = "Stolen card - The card has been designated as lost or stolen.";
+            break;
+            case "10051" :
+                $sEVENT_ID = "Insufficient funds - The card has insufficient funds to cover the cost of the transaction.";
+            break;
+            case "10054" :
+                $sEVENT_ID = "Expired card - The payment gateway declined the transaction because the expiration date is expired or does not match.";
+            break;
+            default:
+                $sEVENT_ID = "The transaction was declined - incorrect card details and/or no available balance";
+        }
+
         global $woocommerce;
         $order = new WC_Order($ORDER_ID);
         $order->update_status('failed', '');
-        $order->add_order_note("Event: " . $EVENT_ID . ", Status Id: " . $STATUS_ID . ", Code: " . $ERROR_CODE . ", Message: " . $ERROR_TEXT);
+        $order->add_order_note("[Error: " .  $EVENT_ID . "] " . $sSTATUS_ID . ". Reason: " . $sEVENT_ID);
     }
 
 }
